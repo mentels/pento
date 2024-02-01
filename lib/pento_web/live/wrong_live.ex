@@ -26,7 +26,7 @@ defmodule PentoWeb.WrongLive do
       message = "Your guess: #{guess}. Wrong! Guess again."
       score = socket.assigns.score - 1
       time = time()
-      {:noreply, assign(socket, score: score, message: message, time: time, status: :lost)}
+      {:noreply, assign(socket, score: score, message: message, time: time)}
     end
   end
 
