@@ -415,6 +415,16 @@ defmodule Pento.AccountsTest do
     end
   end
 
+  describe "user_confirmed?/1" do
+    test "returns false if the user is not confirmed" do
+      refute Accounts.user_confirmed?(user_fixture())
+    end
+
+    test "returns true if the user is confirmed" do
+      assert Accounts.user_confirmed?(confirmed_user_fixture())
+    end
+  end
+
   describe "deliver_user_reset_password_instructions/2" do
     setup do
       %{user: user_fixture()}

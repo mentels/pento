@@ -283,6 +283,11 @@ defmodule Pento.Accounts do
     end
   end
 
+  @doc """
+  Checks if the user is confirmed.
+  """
+  def user_confirmed?(user), do: not is_nil(user.confirmed_at)
+
   defp confirm_user_multi(user) do
     Ecto.Multi.new()
     |> Ecto.Multi.update(:user, User.confirm_changeset(user))

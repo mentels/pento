@@ -6,10 +6,12 @@ defmodule PentoWeb.UserSettingsLiveTest do
   import Pento.AccountsFixtures
 
   describe "Settings page" do
+    # TODO: allow the user to update their email
+    # even if they haven't confirmed the previous one
     test "renders settings page", %{conn: conn} do
       {:ok, _lv, html} =
         conn
-        |> log_in_user(user_fixture())
+        |> log_in_user(confirmed_user_fixture())
         |> live(~p"/users/settings")
 
       assert html =~ "Change Email"
@@ -23,12 +25,23 @@ defmodule PentoWeb.UserSettingsLiveTest do
       assert path == ~p"/users/log_in"
       assert %{"error" => "You must log in to access this page."} = flash
     end
+
+    test "redirects if the user email is not confirmed", %{conn: conn} do
+      assert {:error, redirect} =
+               conn
+               |> log_in_user(user_fixture())
+               |> live(~p"/users/settings")
+
+      assert {:redirect, %{to: path, flash: flash}} = redirect
+      assert path == ~p"/users/confirm"
+      assert %{"error" => "You must confirm your email to access this page."} = flash
+    end
   end
 
   describe "update email form" do
     setup %{conn: conn} do
       password = valid_user_password()
-      user = user_fixture(%{password: password})
+      user = confirmed_user_fixture(%{password: password})
       %{conn: log_in_user(conn, user), user: user, password: password}
     end
 
@@ -85,7 +98,7 @@ defmodule PentoWeb.UserSettingsLiveTest do
   describe "update password form" do
     setup %{conn: conn} do
       password = valid_user_password()
-      user = user_fixture(%{password: password})
+      user = confirmed_user_fixture(%{password: password})
       %{conn: log_in_user(conn, user), user: user, password: password}
     end
 
@@ -160,7 +173,7 @@ defmodule PentoWeb.UserSettingsLiveTest do
 
   describe "confirm email" do
     setup %{conn: conn} do
-      user = user_fixture()
+      user = confirmed_user_fixture()
       email = unique_user_email()
 
       token =

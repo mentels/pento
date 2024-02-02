@@ -200,14 +200,23 @@ defmodule PentoWeb.UserAuth do
   they use the application at all, here would be a good place.
   """
   def require_authenticated_user(conn, _opts) do
-    if conn.assigns[:current_user] do
+    with user when not is_nil(user) <- conn.assigns[:current_user],
+         true <- Accounts.user_confirmed?(user) do
       conn
     else
-      conn
-      |> put_flash(:error, "You must log in to access this page.")
-      |> maybe_store_return_to()
-      |> redirect(to: ~p"/users/log_in")
-      |> halt()
+      nil ->
+        conn
+        |> put_flash(:error, "You must log in to access this page.")
+        |> maybe_store_return_to()
+        |> redirect(to: ~p"/users/log_in")
+        |> halt()
+
+      false ->
+        conn
+        |> put_flash(:error, "You must confirm your email to access this page.")
+        |> maybe_store_return_to()
+        |> redirect(to: ~p"/users/confirm")
+        |> halt()
     end
   end
 

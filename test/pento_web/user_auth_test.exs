@@ -3,18 +3,23 @@ defmodule PentoWeb.UserAuthTest do
 
   alias Phoenix.LiveView
   alias Pento.Accounts
+  alias Pento.Accounts.User
+  alias Pento.Repo
   alias PentoWeb.UserAuth
   import Pento.AccountsFixtures
 
   @remember_me_cookie "_pento_web_user_remember_me"
 
-  setup %{conn: conn} do
+  setup %{conn: conn} = ctx do
     conn =
       conn
       |> Map.replace!(:secret_key_base, PentoWeb.Endpoint.config(:secret_key_base))
       |> init_test_session(%{})
 
-    %{user: user_fixture(), conn: conn}
+    user = user_fixture()
+    user = if ctx[:confirm_user?], do: confirm_user(user), else: user
+
+    %{user: user, conn: conn}
   end
 
   describe "log_in_user/3" do
@@ -237,6 +242,22 @@ defmodule PentoWeb.UserAuthTest do
                "You must log in to access this page."
     end
 
+    test "redirects authenticated user if their email is not confimed", %{conn: conn, user: user} do
+      conn =
+        conn
+        |> assign(:current_user, user)
+        |> fetch_flash()
+        |> UserAuth.require_authenticated_user([])
+
+      assert conn.halted
+
+      assert redirected_to(conn) == ~p"/users/confirm"
+
+      assert Phoenix.Flash.get(conn.assigns.flash, :error) ==
+               "You must confirm your email to access this page."
+    end
+
+    # TODO: test that for authenticated but not confirmed emails
     test "stores the path to redirect to on GET", %{conn: conn} do
       halted_conn =
         %{conn | path_info: ["foo"], query_string: ""}
@@ -263,10 +284,22 @@ defmodule PentoWeb.UserAuthTest do
       refute get_session(halted_conn, :user_return_to)
     end
 
+    @tag confirm_user?: true
     test "does not redirect if user is authenticated", %{conn: conn, user: user} do
-      conn = conn |> assign(:current_user, user) |> UserAuth.require_authenticated_user([])
+      conn =
+        conn
+        |> fetch_flash
+        |> assign(:current_user, user)
+        |> UserAuth.require_authenticated_user([])
+
       refute conn.halted
       refute conn.status
     end
+  end
+
+  defp confirm_user(user) do
+    user
+    |> User.confirm_changeset()
+    |> Repo.update!()
   end
 end
