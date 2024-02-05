@@ -5,6 +5,7 @@ defmodule PentoWeb.UserSessionController do
   alias PentoWeb.UserAuth
 
   def create(conn, %{"_action" => "registered"} = params) do
+    # TOOD: redirect to a page that is allowed for unconfrimed email if creating the session just afterd the user has registered
     create(conn, params, "Account created successfully!")
   end
 

@@ -6,6 +6,7 @@ defmodule Pento.Accounts.User do
     field :email, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
+    field :username, :string
     field :confirmed_at, :naive_datetime
 
     timestamps(type: :utc_datetime)
@@ -34,11 +35,13 @@ defmodule Pento.Accounts.User do
       submitting the form), this option can be set to `false`.
       Defaults to `true`.
   """
+  # TODO: make the username optional, and generate one
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:email, :password, :username])
     |> validate_email(opts)
     |> validate_password(opts)
+    |> unique_constraint(:username)
   end
 
   defp validate_email(changeset, opts) do
@@ -119,6 +122,16 @@ defmodule Pento.Accounts.User do
     |> cast(attrs, [:password])
     |> validate_confirmation(:password, message: "does not match password")
     |> validate_password(opts)
+  end
+
+  @doc """
+  A user changeset for changing the username.
+  """
+  # TODO: validate the username (e.g. no special characters)
+  def usernmae_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:username])
+    |> unique_constraint(:username)
   end
 
   @doc """
