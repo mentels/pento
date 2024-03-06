@@ -118,8 +118,8 @@ defmodule PentoWeb.UserAuth do
       there's no user_token or no matching user.
 
     * `:ensure_authenticated` - Authenticates the user from the session,
-      and assigns the current_user to socket assigns based
-      on user_token.
+      assigns the current_user and session_id to socket assigns based on user_token
+      and live_socket_id respectively
       Redirects to login page if there's no logged user.
 
     * `:redirect_if_user_is_authenticated` - Authenticates the user from the session.
@@ -148,7 +148,7 @@ defmodule PentoWeb.UserAuth do
   end
 
   def on_mount(:ensure_authenticated, _params, session, socket) do
-    socket = mount_current_user(socket, session)
+    socket = socket |> mount_current_user(session) |> assign_session_id(session)
 
     if socket.assigns.current_user do
       {:cont, socket}
@@ -178,6 +178,10 @@ defmodule PentoWeb.UserAuth do
         Accounts.get_user_by_session_token(user_token)
       end
     end)
+  end
+
+  defp assign_session_id(socket, session) do
+    Phoenix.Component.assign_new(socket, :session_id, fn -> session["live_socket_id"] end)
   end
 
   @doc """

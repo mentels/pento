@@ -37,4 +37,10 @@ defmodule Pento.AccountsFixtures do
     [_, token | _] = String.split(captured_email.text_body, "[TOKEN]")
     token
   end
+
+  def confirm_user(user) do
+    user
+    |> Pento.Accounts.User.confirm_changeset()
+    |> Pento.Repo.update!()
+  end
 end

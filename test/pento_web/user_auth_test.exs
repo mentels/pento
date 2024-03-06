@@ -3,8 +3,6 @@ defmodule PentoWeb.UserAuthTest do
 
   alias Phoenix.LiveView
   alias Pento.Accounts
-  alias Pento.Accounts.User
-  alias Pento.Repo
   alias PentoWeb.UserAuth
   import Pento.AccountsFixtures
 
@@ -27,7 +25,7 @@ defmodule PentoWeb.UserAuthTest do
       conn = UserAuth.log_in_user(conn, user)
       assert token = get_session(conn, :user_token)
       assert get_session(conn, :live_socket_id) == "users_sessions:#{Base.url_encode64(token)}"
-      assert redirected_to(conn) == ~p"/"
+      assert redirected_to(conn) == ~p"/guess"
       assert Accounts.get_user_by_session_token(token)
     end
 
@@ -42,7 +40,11 @@ defmodule PentoWeb.UserAuthTest do
     end
 
     test "writes a cookie if remember_me is configured", %{conn: conn, user: user} do
-      conn = conn |> fetch_cookies() |> UserAuth.log_in_user(user, %{"remember_me" => "true"})
+      conn =
+        conn
+        |> fetch_cookies()
+        |> UserAuth.log_in_user(user, %{"remember_me" => "true"})
+
       assert get_session(conn, :user_token) == conn.cookies[@remember_me_cookie]
 
       assert %{value: signed_token, max_age: max_age} = conn.resp_cookies[@remember_me_cookie]
@@ -188,6 +190,21 @@ defmodule PentoWeb.UserAuthTest do
       {:halt, updated_socket} = UserAuth.on_mount(:ensure_authenticated, %{}, session, socket)
       assert updated_socket.assigns.current_user == nil
     end
+
+    test "stores session_id in the socket based on the live_socket_id", %{conn: conn, user: user} do
+      user_token = Accounts.generate_user_session_token(user)
+
+      session =
+        conn
+        |> put_session(:user_token, user_token)
+        |> put_session(:live_socket_id, "users_sessions:#{Base.url_encode64(user_token)}")
+        |> get_session()
+
+      {:cont, updated_socket} =
+        UserAuth.on_mount(:ensure_authenticated, %{}, session, %LiveView.Socket{})
+
+      assert updated_socket.assigns.session_id == session["live_socket_id"]
+    end
   end
 
   describe "on_mount: :redirect_if_user_is_authenticated" do
@@ -221,7 +238,7 @@ defmodule PentoWeb.UserAuthTest do
     test "redirects if user is authenticated", %{conn: conn, user: user} do
       conn = conn |> assign(:current_user, user) |> UserAuth.redirect_if_user_is_authenticated([])
       assert conn.halted
-      assert redirected_to(conn) == ~p"/"
+      assert redirected_to(conn) == ~p"/guess"
     end
 
     test "does not redirect if user is not authenticated", %{conn: conn} do
@@ -295,11 +312,5 @@ defmodule PentoWeb.UserAuthTest do
       refute conn.halted
       refute conn.status
     end
-  end
-
-  defp confirm_user(user) do
-    user
-    |> User.confirm_changeset()
-    |> Repo.update!()
   end
 end
