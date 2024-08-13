@@ -77,5 +77,35 @@ defmodule Pento.CatalogTest do
       product = product_fixture()
       assert %Ecto.Changeset{} = Catalog.change_product(product)
     end
+
+    test "markdown_product/2 returns a product with the decreased price" do
+      product = product_fixture(%{unit_price: 120.5})
+      assert {:ok, %Product{} = markdowned_product} = Catalog.markdown_product(product, 20.5)
+      assert markdowned_product.unit_price == 100.0
+    end
+
+    test "markdown_product/2 with invalid data returns error" do
+      product = product_fixture()
+
+      assert {:error, "Markdown amount must be a number"} =
+               Catalog.markdown_product(product, :invalid)
+
+      assert product == Catalog.get_product!(product.id)
+    end
+
+    test "markdown_product/2 with invalid data returns error changeset (increased unit_price)" do
+      product = product_fixture()
+      assert {:error, %Ecto.Changeset{}} = Catalog.markdown_product(product, -5)
+      assert product == Catalog.get_product!(product.id)
+    end
+
+    test "markdown_product/2 with invalid data returns error changeset (negative unit_price)" do
+      product = product_fixture()
+
+      assert {:error, %Ecto.Changeset{}} =
+               Catalog.markdown_product(product, product.unit_price * 2)
+
+      assert product == Catalog.get_product!(product.id)
+    end
   end
 end

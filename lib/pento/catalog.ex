@@ -101,4 +101,15 @@ defmodule Pento.Catalog do
   def change_product(%Product{} = product, attrs \\ %{}) do
     Product.changeset(product, attrs)
   end
+
+  def markdown_product(%Product{} = product, amount) do
+    with {:ok, amount} <- validate_markdown_amount(amount) do
+      product
+      |> Product.decrease_price(%{unit_price: product.unit_price - amount})
+      |> Repo.update()
+    end
+  end
+
+  defp validate_markdown_amount(amount) when is_number(amount), do: {:ok, amount}
+  defp validate_markdown_amount(_), do: {:error, "Markdown amount must be a number"}
 end
