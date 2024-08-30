@@ -1,15 +1,17 @@
 <.header>
   Listing Products
+  <%!-- What are the text-2xl alternatives? --%>
+  <h1 class="text-sm font-bold"><%= @greeting %></h1>
   <:actions>
     <.link patch={~p"/products/new"}>
       <.button>New Product</.button>
     </.link>
   </:actions>
 </.header>
-
+<%!-- @streams.product will store the products client side removing them from the assigns --%>
 <.table
   id="products"
-  rows={@streams.products}
+  rows={@streams.products} 
   row_click={fn {_id, product} -> JS.navigate(~p"/products/#{product}") end}
 >
   <:col :let={{_id, product}} label="Name"><%= product.name %></:col>
