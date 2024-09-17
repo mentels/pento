@@ -1,6 +1,5 @@
 <.header>
-  Listing Products
-  <%!-- What are the text-2xl alternatives? --%>
+  Listing Products <%!-- What are the text-2xl alternatives? --%>
   <h1 class="text-sm font-bold"><%= @greeting %></h1>
   <:actions>
     <.link patch={~p"/products/new"}>
@@ -11,7 +10,7 @@
 <%!-- @streams.product will store the products client side removing them from the assigns --%>
 <.table
   id="products"
-  rows={@streams.products} 
+  rows={@streams.products}
   row_click={fn {_id, product} -> JS.navigate(~p"/products/#{product}") end}
 >
   <:col :let={{_id, product}} label="Name"><%= product.name %></:col>
@@ -34,7 +33,12 @@
   </:action>
 </.table>
 
-<.modal :if={@live_action in [:new, :edit]} id="product-modal" show on_cancel={JS.patch(~p"/products")}>
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="product-modal"
+  show
+  on_cancel={JS.patch(~p"/products")}
+>
   <.live_component
     module={PentoWeb.ProductLive.FormComponent}
     id={@product.id || :new}
