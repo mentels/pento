@@ -17,6 +17,10 @@
 
 <.back navigate={~p"/products"}>Back to products</.back>
 
+<div>
+  <img alt="product image" width="200" src={@product.image} />
+</div>
+
 <.modal
   :if={@live_action == :edit}
   id="product-modal"
