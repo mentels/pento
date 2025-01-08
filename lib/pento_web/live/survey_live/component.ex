@@ -6,19 +6,19 @@ defmodule PentoWeb.SurveyLive.Component do
 
   def hero(assigns) do
     ~H"""
-    <h1 class="font-heavy ext-3xl">
+    <h1 class="font-heavy text-3xl">
       <%= @content %>
     </h1>
     <h3>
       <%= render_slot(@inner_block) %>
     </h3>
-    <pre>
+    <%!-- <pre>
       <%= inspect(assigns, pretty: true) %>
       <% %{ inner_block: [%{inner_block: block_fn}] } = assigns %>
       <%= inspect(block_fn.(assigns.__changed__, assigns), pretty: true) %>
       <% %{dynamic: dynamic} = block_fn.(assigns.__changed__, assigns) %>
       dynamic: <%= inspect(dynamic.(assigns), pretty: true) %>
-    </pre>
+    </pre> --%>
     """
   end
 end
