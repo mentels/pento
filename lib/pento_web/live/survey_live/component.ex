@@ -1,6 +1,43 @@
 defmodule PentoWeb.SurveyLive.Component do
   use Phoenix.Component
 
+  def ul(assigns) do
+    ~H"""
+    <ul>
+      <%= for item <- @items do %>
+        <.li><%= item %></.li>
+      <% end %>
+    </ul>
+    """
+  end
+
+  def li(assigns) do
+    ~H"""
+    <li>
+      <%= render_slot(@inner_block) %>
+    </li>
+    """
+  end
+
+  def ul2(assigns) do
+    ~H"""
+    <ul :for={item <- @items}>
+      <.li2 item={item} inner_block={@inner_block} />
+      <%!-- below doesn't work --%>
+      <%!-- <.li2 item={item}><%= @inner_block %></.li2> --%>
+      <%!-- <li><%= render_slot(@inner_block, item) %></li> --%>
+    </ul>
+    """
+  end
+
+  def li2(assigns) do
+    ~H"""
+    <li>
+      <%= render_slot(@inner_block, @item) %>
+    </li>
+    """
+  end
+
   attr :content, :string, required: true
   slot :inner_block, required: true
 

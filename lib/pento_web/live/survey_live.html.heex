@@ -1,3 +1,7 @@
+<Component2.render title="Take the Survey" heading="It wont take long" message="Please fill out the survey" />
+
+<hr class="py-3">
+
 <Component.hero content="Survey" >
   Please fill out the survey
 </Component.hero>
@@ -8,3 +12,19 @@
   <h2>Demographic Form coming soon!</h2>
 <% end %>
 
+<hr class="py-3">
+
+
+<Component2.render title="Thanks!" heading="Thanks for Taking the Survey" message="See you again!" />
+
+<hr class="py-3">
+
+<Component.li>test li</Component.li>
+<Component.ul items={~w(igi franek jasiek)} />
+
+<hr class="py-3">
+
+<Component.li2 :let={item_var} item="test">I like <%= item_var %></Component.li2>
+<Component.ul2 :let={item} items={~w(igi franek jasiek)}>
+  I like <b><%= item %></b>
+</Component.ul2>
