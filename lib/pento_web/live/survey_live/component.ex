@@ -24,7 +24,7 @@ defmodule PentoWeb.SurveyLive.Component do
     <ul :for={item <- @items}>
       <.li2 item={item} inner_block={@inner_block} />
       <%!-- below doesn't work --%>
-      <%!-- <.li2 item={item}><%= @inner_block %></.li2> --%>
+      <%!-- <.li2 }item={item}><%= @inner_block %></.li2> --%>
       <%!-- <li><%= render_slot(@inner_block, item) %></li> --%>
     </ul>
     """

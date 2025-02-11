@@ -14,10 +14,10 @@ defmodule PentoWeb.DemographicLive.Show do
         Demographics <%= raw("&#x2713;") %>
       </h2>
       <CoreComponents.table rows={[@demographic]} id={to_string(@demographic.id)}>
-        <:col :let={demographic} , label="Gender">
+        <:col :let={demographic} label="Gender">
           <%= @demographic.gender %>
         </:col>
-        <:col :let={demographic} , label="Year of Birth">
+        <:col :let={demographic} label="Year of Birth">
           <%= @demographic.year_of_birth %>
         </:col>
       </CoreComponents.table>

@@ -1,7 +1,3 @@
-<Component2.render title="Take the Survey" heading="It wont take long" message="Please fill out the survey" />
-
-<hr class="py-3">
-
 <Component.hero content="Survey" >
   Please fill out the survey
 </Component.hero>
@@ -9,8 +5,14 @@
 <%= if @demographic do %>
   <DemographicLive.Show.details demographic={@demographic} />
 <% else %>
-  <h2>Demographic Form coming soon!</h2>
+  <.live_component module={DemographicLive.Form} id="demographic-form" current_user={@current_user} />
 <% end %>
+
+
+<hr class="py-10">
+
+<h1 class="text-4xl font-bold text-purple-600 mb-8 tracking-wide">Experiments</h1>
+<Component2.render title="Take the Survey" heading="It wont take long" message="Please fill out the survey" />
 
 <hr class="py-3">
 
